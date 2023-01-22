@@ -15,14 +15,6 @@ class ScrapedPage
         }
     }
 
-    // public function __set($prop, $value){
-    //     return $this->_data[$prop] = $value;
-    // }
-  
-    // public function __get($prop){
-    //     return array_key_exists($prop, $this->_data) ? $this->_data[$prop]: null;
-    // }
-
     /**
      * @return string
      */
@@ -61,6 +53,14 @@ class ScrapedPage
     public function getExternalLinks(): array 
     {
         return $this->externalLinks;
+    }
+
+    /**
+     * @return array
+     */
+    public function getImages(): array 
+    {
+        return $this->images;
     }
 
     /**
