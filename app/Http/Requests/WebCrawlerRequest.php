@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
 
-class WebCrawlerRequest extends FormRequest 
+class WebCrawlerRequest extends FormRequest
 {
     public function rules()
     {
@@ -20,12 +20,12 @@ class WebCrawlerRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         $errors = $validator->errors();
-    
+
         $response = response()->json([
             'message' => 'Invalid data',
             'details' => $errors->messages(),
         ], Response::HTTP_UNPROCESSABLE_ENTITY);
-    
+
         throw new HttpResponseException($response);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\ScrapedPage;
+use App\Helpers\ScrapedPage;
 
 class WebCrawlerResultsResource extends JsonResource
 {
@@ -26,16 +26,16 @@ class WebCrawlerResultsResource extends JsonResource
 
         // Aggregate totals.
         /** @var ScrapedPage $scrapedPage */
-        foreach ($this->resource as $scrapedPage) { 
+        foreach ($this->resource as $scrapedPage) {
             $rollUp['numPages']++;
-            $rollUp['numImages']+= count($scrapedPage->getImages()); 
-            $rollUp['numInternalLinks']+= count($scrapedPage->getInternalLinks()); 
-            $rollUp['numExternalLinks']+= count($scrapedPage->getExternalLinks()); 
+            $rollUp['numImages']+= count($scrapedPage->getImages());
+            $rollUp['numInternalLinks']+= count($scrapedPage->getInternalLinks());
+            $rollUp['numExternalLinks']+= count($scrapedPage->getExternalLinks());
             $loadTimeTotal+= $scrapedPage->getLoadTime();
             $wordCountTotal+= $scrapedPage->getWordCount();
             $titleLengthTotal+= strlen($scrapedPage->getTitle());
         }
-        
+
         // Calculate averages.
         $rollUp['avgLoadTime'] = round($loadTimeTotal / $rollUp['numPages']);
         $rollUp['avgWordCount'] = round($wordCountTotal / $rollUp['numPages']);

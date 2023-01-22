@@ -69,11 +69,12 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th colspan="3">Pages crawled</th>
+                                    <th colspan="4">Pages crawled</th>
                                 </tr>
                                 <tr>
                                     <th>Title</th>
                                     <th>URL</th>
+                                    <th>Status code</th>
                                     <th>Load time (ms)</th>
                                 </tr>
                             </thead>
@@ -82,6 +83,7 @@
                                 <tr>
                                     <td>{{ $page->getTitle() }}</td>
                                     <td>{{ $page->getUrl() }}</td>
+                                    <td>{{ $page->getStatusCode() }}</td>
                                     <td>{{ $page->getLoadTime() }}</td>
                                 </tr>
                                 @endforeach
