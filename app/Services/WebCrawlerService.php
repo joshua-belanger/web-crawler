@@ -74,30 +74,15 @@ class WebCrawlerService
      */
     private function scrapePage(string $url): ScrapedPage|false
     {
-        // Using Guzzle for HTTP requests so that we can get nice status codes, etc.
-        $client = new \GuzzleHttp\Client();
-        $loadTime = 0;
-
-        try {
-            $response = $client->get($url, [
-                // on_stats callback allows us to check response time.
-                'on_stats' => function (\GuzzleHttp\TransferStats $stats) use (&$loadTime) {
-                    $loadTime = $stats->getTransferTime() * 1000;
-                },
-                // Disable error reporting so that we can capture status code.
-                'request.options' => array(
-                    'exceptions' => false,
-                )
-            ]);
-        } catch (\Exception $error) {
-            if ($error instanceof \GuzzleHttp\Exception\ClientException) {
-                $response = $error->getResponse();
-            }
-
+        // Hit the URL for a response.
+        $responseData = $this->getUrlResponseData($url);
+        if (empty($responseData)) {
             return false;
         }
+        $response = $responseData['response'];
+        $loadTime = $responseData['loadTime'];
 
-        // If we didn't get a 200 then the page cannot be processed.
+        // If we didn't get a 200 then the nodes cannot be processed, so just return the response code and load time.
         if ($response->getStatusCode() !== 200) {
             return new ScrapedPage([
                 'statusCode' => $response->getStatusCode(),
@@ -126,6 +111,7 @@ class WebCrawlerService
         foreach ($pageXML->getElementsByTagName('*') as $element) {
             switch ($element->nodeName) {
                 case 'title':
+                    // Store titles for display.
                     $title = $element->nodeValue;
                     $wordCount += str_word_count($title);
                     break;
@@ -175,5 +161,42 @@ class WebCrawlerService
             'externalLinks' => $externalLinks,
             'images' => $images,
         ]);
+    }
+
+    /**
+     * Use Guzzle to fetch reponse data for the requested URL.
+     *
+     * @param string $url The URL of the page to be fetched
+     * @return array
+     */
+    private function getUrlResponseData(string $url): array|false
+    {
+        // Using Guzzle for HTTP requests so that we can get nice status codes, etc.
+        $client = new \GuzzleHttp\Client();
+        $loadTime = 0;
+
+        try {
+            $response = $client->get($url, [
+                // on_stats callback allows us to check response time.
+                'on_stats' => function (\GuzzleHttp\TransferStats $stats) use (&$loadTime) {
+                    $loadTime = $stats->getTransferTime() * 1000;
+                },
+                // Disable error reporting so that we can capture status code.
+                'request.options' => array(
+                    'exceptions' => false,
+                )
+            ]);
+        } catch (\Exception $error) {
+            if ($error instanceof \GuzzleHttp\Exception\ClientException) {
+                $response = $error->getResponse();
+            }
+
+            return [];
+        }
+
+        return [
+            'response' => $response,
+            'loadTime' => $loadTime,
+        ];
     }
 }

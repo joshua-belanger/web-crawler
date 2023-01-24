@@ -34,21 +34,4 @@ class WebCrawlerRequest extends FormRequest
             'numPages' => 'numPages parameter of 4 - 6 is required',
         ];
     }
-
-    /**
-     * Handle validation errors.
-     *
-     * @return HttpResponseException
-     */
-    protected function failedValidation(Validator $validator): HttpResponseException
-    {
-        $errors = $validator->errors();
-
-        $response = response()->json([
-            'message' => 'Invalid data',
-            'details' => $errors->messages(),
-        ], Response::HTTP_UNPROCESSABLE_ENTITY);
-
-        throw new HttpResponseException($response);
-    }
 }

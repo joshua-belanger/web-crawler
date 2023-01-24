@@ -11,9 +11,9 @@ class WebCrawlerResultsResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array $rollUp
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         $loadTimeTotal = $wordCountTotal = $titleLengthTotal = 0;
 

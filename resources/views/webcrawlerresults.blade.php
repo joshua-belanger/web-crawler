@@ -40,10 +40,17 @@
             <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6">
                     @if ($errors->any())
-                        {{ implode('', $errors->all('<div>:message</div>')) }}
-                    @endif
+                        <div class="justify-center text-gray-600 dark:text-gray-400 text-lg">
+                            <b>Error:</b>
+                            {!! implode('', $errors->all('<div class="display:block">:message</div>')) !!}
+                        </div>
+                    @else 
                     @if ($totals['numPages']) 
-                    <div class="mt-2 text-gray-600 dark:text-gray-400 text-md">
+                    <div class="flex justify-center mt-2 text-gray-600 dark:text-gray-400 text-md">
+                            <b class="text-lg center">Results</b>
+                        </div>
+                    <div class="flex justify-center mt-2 text-gray-600 dark:text-gray-400 text-md">
+
                         <table>
                             <thead>
                                 <tr>
@@ -70,12 +77,12 @@
                         </table>
                     </div>
                     @else
-                    <p class="mt-2 text-gray-600 dark:text-gray-400 text-md">
+                    <div class="flex justify-center mt-2 text-gray-600 dark:text-gray-400 text-md">
                         The requested domain could not be crawled, it may be invalid.
-                    </p>
+                    </div>
                     @endif
                     @if ($scrapedPages)
-                    <div class="mt-2 text-gray-600 dark:text-gray-400 text-md">
+                    <div class="flex justify-center mt-2 text-gray-600 dark:text-gray-400 text-md">
                         <table>
                             <thead>
                                 <tr>
@@ -100,6 +107,7 @@
                             </tbody>
                         </table>
                     </div>
+                    @endif
                     @endif
                 </div>
             </div>
