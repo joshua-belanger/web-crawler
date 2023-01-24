@@ -22,7 +22,14 @@ class WebCrawlerResultsResource extends JsonResource
             'numImages' => 0,
             'numInternalLinks' => 0,
             'numExternalLinks' => 0,
+            'avgLoadTime' => 0,
+            'avgWordCount' => 0,
+            'avgTitleLength' => 0,
         ];
+
+        if (count($this->resource) < 1) {
+            return $rollUp;
+        }
 
         // Aggregate totals.
         /** @var ScrapedPage $scrapedPage */

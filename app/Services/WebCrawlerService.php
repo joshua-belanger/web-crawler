@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\ScrapedPage;
 use DOMDocument;
+use Exception;
 use Illuminate\Support\Collection;
 
 class WebCrawlerService
@@ -21,9 +22,9 @@ class WebCrawlerService
     /**
      * Using the URL as an entry point, scrape the requested number of pages.
      *
-     * @return Collection $scrapedPages Contains scraped page data
+     * @return Collection|false $scrapedPages Contains scraped page data
      */
-    public function scrapeDomain(): Collection
+    public function scrapeDomain(): Collection|false
     {
         $scrapedPages = [];
 
@@ -31,6 +32,10 @@ class WebCrawlerService
         $urlResult = parse_url($this->url);
         $this->baseUrl = $urlResult['scheme']."://".$urlResult['host'];
         $scrapedEntryPage = $this->scrapePage($this->baseUrl, $this->url);
+
+        if (!$scrapedEntryPage) {
+            return false;
+        }
 
         // Record page as scraped.
         $scrapedPages[$scrapedEntryPage->getUrl()] = $scrapedEntryPage;
@@ -52,6 +57,9 @@ class WebCrawlerService
 
             // Scrape and record.
             $scrapedPage = $this->scrapePage($pageUrl);
+            if (!$scrapedPage) {
+                continue;
+            }
             $scrapedPages[$scrapedPage->getUrl()] = $scrapedPage;
         }
 
@@ -62,19 +70,41 @@ class WebCrawlerService
      * Use Guzzle and DOMDocument to scrape a given URL.
      *
      * @param string $url The URL of the page to be scraped
-     * @return ScrapedPage
+     * @return ScrapedPage|false
      */
-    private function scrapePage(string $url): ScrapedPage
+    private function scrapePage(string $url): ScrapedPage|false
     {
         // Using Guzzle for HTTP requests so that we can get nice status codes, etc.
         $client = new \GuzzleHttp\Client();
         $loadTime = 0;
-        $response = $client->get($url, [
-            // on_stats callback allows us to check response time.
-            'on_stats' => function (\GuzzleHttp\TransferStats $stats) use (&$loadTime) {
-                $loadTime = $stats->getTransferTime() * 1000;
+
+        try {
+            $response = $client->get($url, [
+                // on_stats callback allows us to check response time.
+                'on_stats' => function (\GuzzleHttp\TransferStats $stats) use (&$loadTime) {
+                    $loadTime = $stats->getTransferTime() * 1000;
+                },
+                // Disable error reporting so that we can capture status code.
+                'request.options' => array(
+                    'exceptions' => false,
+                )
+            ]);
+        } catch (\Exception $error) {
+            if ($error instanceof \GuzzleHttp\Exception\ClientException) {
+                $response = $error->getResponse();
             }
-        ]);
+
+            return false;
+        }
+
+        // If we didn't get a 200 then the page cannot be processed.
+        if ($response->getStatusCode() !== 200) {
+            return new ScrapedPage([
+                'statusCode' => $response->getStatusCode(),
+                'url' => $url,
+                'loadTime' => $loadTime,
+            ]);
+        }
 
         /*
         PHP's native DOMDocument can't handle HTML5 tags, even in PHP 8. You can use Goutte with masterminds/html5 for

@@ -39,6 +39,10 @@
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
             <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6">
+                    @if ($errors->any())
+                        {{ implode('', $errors->all('<div>:message</div>')) }}
+                    @endif
+                    @if ($totals['numPages']) 
                     <div class="mt-2 text-gray-600 dark:text-gray-400 text-md">
                         <table>
                             <thead>
@@ -65,6 +69,12 @@
                             </tbody>
                         </table>
                     </div>
+                    @else
+                    <p class="mt-2 text-gray-600 dark:text-gray-400 text-md">
+                        The requested domain could not be crawled, it may be invalid.
+                    </p>
+                    @endif
+                    @if ($scrapedPages)
                     <div class="mt-2 text-gray-600 dark:text-gray-400 text-md">
                         <table>
                             <thead>
@@ -90,6 +100,7 @@
                             </tbody>
                         </table>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>

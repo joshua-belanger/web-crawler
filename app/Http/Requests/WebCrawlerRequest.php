@@ -9,7 +9,12 @@ use Illuminate\Http\Response;
 
 class WebCrawlerRequest extends FormRequest
 {
-    public function rules()
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules(): array
     {
         return [
             'url' => 'required|url',
@@ -17,7 +22,25 @@ class WebCrawlerRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'url' => 'A valid url parameter is required',
+            'numPages' => 'numPages parameter of 4 - 6 is required',
+        ];
+    }
+
+    /**
+     * Handle validation errors.
+     *
+     * @return HttpResponseException
+     */
+    protected function failedValidation(Validator $validator): HttpResponseException
     {
         $errors = $validator->errors();
 

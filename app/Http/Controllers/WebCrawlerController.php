@@ -21,7 +21,7 @@ class WebCrawlerController extends Controller
         $webCrawler = new WebCrawlerService($requestData['url'], $requestData['numPages']);
         $scrapedPages = $webCrawler->scrapeDomain();
 
-        $totals = new WebCrawlerResultsResource($scrapedPages);
+        $totals = new WebCrawlerResultsResource($scrapedPages ? $scrapedPages : collect());
 
         return view('webcrawlerresults', [
             'totals' => $totals->toArray($scrapedPages),
